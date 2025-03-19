@@ -23,4 +23,4 @@ ENV PORT=8000
 
 EXPOSE $PORT
 
-CMD [ "uv", "run", "fastapi", "run", "./src/transcribo_backend/app.py" ]
+CMD [ "uv", "run", "fastapi", "run", "./src/bericht_backend/app.py" ]
