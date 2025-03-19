@@ -9,6 +9,8 @@ WORKDIR /app
 COPY uv.lock /app/uv.lock
 COPY pyproject.toml /app/pyproject.toml
 
+RUN pip install streamlit
+
 # Install dependencies
 RUN uv sync --frozen --no-install-project
 
