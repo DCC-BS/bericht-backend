@@ -30,7 +30,7 @@ services:
             - driver: nvidia
               device_ids: [ '1' ]
               capabilities: [ gpu ]
-  transcribo-backend:
+  bericht-backend:
     build:
       context: .
       dockerfile: ./Dockerfile

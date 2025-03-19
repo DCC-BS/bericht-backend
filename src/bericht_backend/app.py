@@ -23,8 +23,8 @@ async def websocket_endpoint(websocket: WebSocket):
         print("Client disconnected")
 
 
-@app.post("/sst")
-async def sst(audio_file: UploadFile) -> TranscriptionResponse:
+@app.post("/stt")
+async def stt(audio_file: UploadFile) -> TranscriptionResponse:
     """
     Endpoint to submit a transcription task.
     """
