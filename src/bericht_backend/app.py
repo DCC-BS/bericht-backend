@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, Form, HTTPException, UploadFile
 
 from bericht_backend.models.generate_title_input import GenerateTitleInput
 from bericht_backend.models.generate_title_response import GenerateTitleResponse
@@ -48,7 +49,7 @@ async def generate_title(request_body: GenerateTitleInput) -> GenerateTitleRespo
 
 
 @app.post("/send")
-async def send_mail(to_email: str, subject: str, body: str, file: UploadFile):
+async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Form()], body: Annotated[str, Form()], file: UploadFile):
     """
     Endpoint to send an email.
     """
@@ -64,7 +65,7 @@ async def send_mail(to_email: str, subject: str, body: str, file: UploadFile):
     )
 
     if not succcess:
-        logger.error("Failed to send email", to_email=to_email, subject=subject)
+        logger.error("Failed to send meail", to_email=to_email, subject=subject)
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
