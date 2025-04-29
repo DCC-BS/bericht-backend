@@ -1,4 +1,20 @@
 services:
+  vllm_gemma3_27b:
+    image: vllm/vllm-openai:v0.8.5
+    container_name: vllm_gemma3_27b
+    ports:
+      - 50002:8000
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
   faster_whisper:
     build:
       context: https://github.com/DCC-BS/bentoml-faster-whisper.git

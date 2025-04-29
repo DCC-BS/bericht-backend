@@ -1,10 +1,14 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, UploadFile
 
+from bericht_backend.models.generate_title_input import GenerateTitleInput
+from bericht_backend.models.generate_title_response import GenerateTitleResponse
 from bericht_backend.models.transcription_response import TranscriptionResponse
-from bericht_backend.services.whisper_services import speech_to_text
 from bericht_backend.services.mail_services import send_email
+from bericht_backend.services.open_ai_facade import OpenAIFacade
+from bericht_backend.services.title_generation_service import TitleGenerationService
+from bericht_backend.services.whisper_services import speech_to_text
 from bericht_backend.utils.logger import get_logger, init_logger
 
 init_logger()
@@ -12,6 +16,9 @@ logger = get_logger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI()
+
+openAiFacade = OpenAIFacade()
+title_generation_service = TitleGenerationService(openAiFacade)
 
 
 @app.post("/stt")
@@ -32,6 +39,12 @@ async def stt(audio_file: UploadFile) -> TranscriptionResponse:
     # Submit the transcription task
     transcription = await speech_to_text(audio_data)
     return transcription
+
+
+@app.post("/title")
+async def generate_title(request_body: GenerateTitleInput) -> GenerateTitleResponse:
+    title = title_generation_service.generate_title(request_body.text)
+    return GenerateTitleResponse(title=title)
 
 
 @app.post("/send")
