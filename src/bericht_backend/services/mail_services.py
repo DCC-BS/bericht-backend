@@ -33,7 +33,10 @@ def send_email(
     msg["Subject"] = subject
 
     msg.attach(MIMEText(body, "plain"))
-
+    
+    if word_filename is None:
+        word_filename = "report.docx"
+    
     # If a Word file attachment was provided, attach it to the email
     if word_attachment:
         part = MIMEBase("application", "vnd.openxmlformats-officedocument.wordprocessingml.document")
