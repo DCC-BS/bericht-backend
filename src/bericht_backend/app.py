@@ -49,7 +49,7 @@ async def generate_title(request_body: GenerateTitleInput) -> GenerateTitleRespo
 
 
 @app.post("/send")
-async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Form()], body: Annotated[str, Form()], file: UploadFile):
+async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Form()], email_body: Annotated[str, Form()], file: UploadFile):
     """
     Endpoint to send an email.
     """
@@ -59,7 +59,7 @@ async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Fo
     succcess = send_email(
         to_email=to_email,
         subject=subject,
-        body=body,
+        body=email_body,
         word_attachment=word_attachment,
         word_filename=file.file.name,
     )

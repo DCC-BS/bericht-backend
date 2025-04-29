@@ -14,6 +14,11 @@ services:
             - driver: nvidia
               count: all
               capabilities: [ gpu ]
+    ipc: host
+    volumes:
+      - ${HUGGING_FACE_CACHE_DIR}:/root/.cache/huggingface
+    command: >
+      --port 8000 --model ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g --max-model-len 32000 --gpu-memory-utilization 0.83 --max-num-seqs 1 --tensor-parallel-size 2
 
   faster_whisper:
     build:
