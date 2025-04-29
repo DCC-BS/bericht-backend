@@ -1,26 +1,17 @@
-import logging
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 
 from bericht_backend.models.transcription_response import TranscriptionResponse
 from bericht_backend.services.whisper_services import speech_to_text
+from bericht_backend.services.mail_services import send_email
+from bericht_backend.utils.logger import get_logger, init_logger
 
-logger = logging.getLogger(__name__)
+init_logger()
+logger = get_logger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI()
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            data = await websocket.receive_bytes()
-            # await websocket.send_text(f"Message received: {data}")
-    except WebSocketDisconnect:
-        print("Client disconnected")
 
 
 @app.post("/stt")
@@ -41,6 +32,29 @@ async def stt(audio_file: UploadFile) -> TranscriptionResponse:
     # Submit the transcription task
     transcription = await speech_to_text(audio_data)
     return transcription
+
+
+@app.post("/send")
+async def send_mail(to_email: str, subject: str, body: str, file: UploadFile):
+    """
+    Endpoint to send an email.
+    """
+
+    word_attachment = await file.read()
+
+    succcess = send_email(
+        to_email=to_email,
+        subject=subject,
+        body=body,
+        word_attachment=word_attachment,
+        word_filename=file.file.name,
+    )
+
+    if not succcess:
+        logger.error("Failed to send email", to_email=to_email, subject=subject)
+        raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to send email")
+
+    return {"message": "Email sent successfully"}
 
 
 if __name__ == "__main__":  # pragma: no cover
