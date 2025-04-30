@@ -77,9 +77,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/docs", include_in_schema=False)
 def custom_swagger_ui_html():
-    if not app.debug:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
-
     return HTMLResponse(
         """
 <!DOCTYPE html>
