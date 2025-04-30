@@ -2,6 +2,8 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import FastAPI, Form, HTTPException, UploadFile
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from bericht_backend.models.generate_title_input import GenerateTitleInput
 from bericht_backend.models.generate_title_response import GenerateTitleResponse
@@ -16,7 +18,7 @@ init_logger()
 logger = get_logger(__name__)
 
 # Initialize FastAPI app
-app = FastAPI()
+app = FastAPI(docs_url=None)
 
 openAiFacade = OpenAIFacade()
 title_generation_service = TitleGenerationService(openAiFacade)
@@ -69,6 +71,37 @@ async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Fo
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/docs", include_in_schema=False)
+def custom_swagger_ui_html():
+    if not app.debug:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+
+    return HTMLResponse(
+        """
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/swaggerui/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="/static/swaggerui/swagger-ui-bundle.js"></script>
+    <script src="/static/swaggerui/swagger-ui-standalone-preset.js"></script>
+    <script>
+      const ui = SwaggerUIBundle({
+        url: '/openapi.json',
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+      })
+    </script>
+  </body>
+</html>
+        """
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

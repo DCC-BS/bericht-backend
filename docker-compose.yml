@@ -1,6 +1,10 @@
 services:
   vllm_gemma3_27b:
-    image: vllm/vllm-openai:v0.8.5
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./Dockerfile.LLM
+    # image: vllm/vllm-openai:v0.8.5
     container_name: vllm_gemma3_27b
     ports:
       - 50002:8000
@@ -18,15 +22,20 @@ services:
     volumes:
       - ${HUGGING_FACE_CACHE_DIR}:/root/.cache/huggingface
     command: >
-      --port 8000 --model ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g --max-model-len 32000 --gpu-memory-utilization 0.83 --max-num-seqs 1 --tensor-parallel-size 2
+      --port 8000
+      --model ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g
+      --max-model-len 32000
+      --gpu-memory-utilization 0.83
+      --max-num-seqs 1
+      --tensor-parallel-size 2
+      --dtype bfloat16 
+      --block-size 32
 
   faster_whisper:
+    platform: linux/amd64
     build:
       context: https://github.com/DCC-BS/bentoml-faster-whisper.git
       dockerfile: ./Dockerfile
-      platforms:
-        - linux/amd64
-        - linux/arm64
     ports:
       - '50001:50001'
     environment:
@@ -41,6 +50,7 @@ services:
       - MAX_BATCH_SIZE
       - MAX_LATENCY_MS
       - HF_AUTH_TOKEN=${HF_AUTH_TOKEN}
+      - UV_HTTP_TIMEOUT=300
     volumes:
       - hugging_face_cache:/root/.cache/huggingface
     deploy:
