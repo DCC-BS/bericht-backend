@@ -65,8 +65,6 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    depends_on:
-      - faster_whisper
     ports:
       - "8000:8000"
     environment:
