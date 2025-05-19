@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import WebSocket
 
 
 class ConnectionManager:

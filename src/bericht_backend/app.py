@@ -26,7 +26,7 @@ title_generation_service = TitleGenerationService(openAiFacade)
 
 @app.post("/stt")
 async def stt(audio_file: UploadFile) -> TranscriptionResponse:
-    """
+    """ë
     Endpoint to submit a transcription task.
     """
 
