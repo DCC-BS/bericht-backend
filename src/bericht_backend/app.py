@@ -4,12 +4,14 @@ from typing import Annotated
 from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from llm_facade.llm_facade import LLMFacade
+from llm_facade.qwen3 import QwenVllm
 
+from bericht_backend.config import Configuration
 from bericht_backend.models.generate_title_input import GenerateTitleInput
 from bericht_backend.models.generate_title_response import GenerateTitleResponse
 from bericht_backend.models.transcription_response import TranscriptionResponse
 from bericht_backend.services.mail_services import send_email
-from bericht_backend.services.open_ai_facade import OpenAIFacade
 from bericht_backend.services.title_generation_service import TitleGenerationService
 from bericht_backend.services.whisper_services import speech_to_text
 from bericht_backend.utils.logger import get_logger, init_logger
@@ -20,13 +22,19 @@ logger = get_logger(__name__)
 # Initialize FastAPI app
 app = FastAPI(docs_url=None)
 
-openAiFacade = OpenAIFacade()
-title_generation_service = TitleGenerationService(openAiFacade)
+config = Configuration.from_env()
+
+print(config)
+
+llm = QwenVllm(config=config, logger=logger)
+llm_facade = LLMFacade(llm)
+
+title_generation_service = TitleGenerationService(llm_facade)
 
 
 @app.post("/stt")
 async def stt(audio_file: UploadFile) -> TranscriptionResponse:
-    """ë
+    """
     Endpoint to submit a transcription task.
     """
 
@@ -51,7 +59,12 @@ async def generate_title(request_body: GenerateTitleInput) -> GenerateTitleRespo
 
 
 @app.post("/send")
-async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Form()], email_body: Annotated[str, Form()], file: UploadFile):
+async def send_mail(
+    to_email: Annotated[str, Form()],
+    subject: Annotated[str, Form()],
+    email_body: Annotated[str, Form()],
+    file: UploadFile,
+):
     """
     Endpoint to send an email.
     """
@@ -67,13 +80,14 @@ async def send_mail(to_email: Annotated[str, Form()], subject: Annotated[str, Fo
     )
 
     if not succcess:
-        logger.error("Failed to send meail", to_email=to_email, subject=subject)
+        logger.error("Failed to send mail", to_email=to_email, subject=subject)
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 @app.get("/docs", include_in_schema=False)
 def custom_swagger_ui_html():

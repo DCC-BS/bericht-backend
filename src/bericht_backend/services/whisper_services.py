@@ -1,19 +1,18 @@
-import json
 import uuid
-from typing import Any
 
 import aiohttp
 from fastapi import APIRouter
 
+from bericht_backend.config import Configuration
 from bericht_backend.models.response_format import ResponseFormat
 from bericht_backend.models.transcription_response import TranscriptionResponse
 
-from ..config import settings
-
 router = APIRouter()
 
+config = Configuration.from_env()
+
 # BentoML API endpoint
-BENTOML_API_URL = f"{settings.whisper_api}/audio/transcriptions"
+BENTOML_API_URL = f"{config.whisper_api}/audio/transcriptions"
 
 
 async def speech_to_text(audio_data: bytes) -> TranscriptionResponse:
@@ -25,7 +24,7 @@ async def speech_to_text(audio_data: bytes) -> TranscriptionResponse:
         file_format: The format of the audio data
 
     """
-    url = f"{settings.whisper_api}/audio/transcriptions"
+    url = f"{config.whisper_api}/audio/transcriptions"
 
     # Prepare form data
     form_data = aiohttp.FormData()

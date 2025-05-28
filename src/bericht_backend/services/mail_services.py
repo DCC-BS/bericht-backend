@@ -8,6 +8,7 @@ from bericht_backend.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def send_email(
     to_email: str,
     subject: str,

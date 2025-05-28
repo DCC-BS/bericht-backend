@@ -22,17 +22,17 @@ dependencies = [
     "aiohttp>=3.11.14",
     "dotenv>=0.9.9",
     "fastapi[all]>=0.115.11",
+    "llm-facade",
     "openai==1.70.0",
-    "pydantic>=2.10.6",
     "python-dotenv>=1.0.1",
     "structlog>=25.1.0",
     "version-pioneer>=0.0.13",
 ]
 
 [project.urls]
-Homepage = "https://swordbreaker.github.io/bericht-backend/"
-Repository = "https://github.com/swordbreaker/bericht-backend"
-Documentation = "https://swordbreaker.github.io/bericht-backend/"
+Homepage = "https://github.com/DCC-BS/bericht-backend/"
+Repository = "https://github.com/DCC-BS/bericht-backend"
+Documentation = "https://github.com/DCC-BS/bericht-backend/"
 
 [dependency-groups]
 dev = [
@@ -162,3 +162,5 @@ exclude_also = [
     "@(abc\\. )?abstractproperty"
 ]
 
+[tool.uv.sources]
+llm-facade = { git = "https://github.com/DCC-BS/llm-facade.bs.py.git", rev = "v0.0.8" }

@@ -1,13 +1,10 @@
 services:
-  vllm_gemma3_27b:
+  vllm_qwen3_32B:
     platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./Dockerfile.LLM
-    # image: vllm/vllm-openai:v0.8.5
-    container_name: vllm_gemma3_27b
+    image: vllm/vllm-openai:v0.8.5
+    container_name: vllm_qwen3_32B
     ports:
-      - 50002:8000
+      - ${LLM_API_PORT}:8000
     environment:
       - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
     runtime: nvidia
@@ -22,14 +19,7 @@ services:
     volumes:
       - ${HUGGING_FACE_CACHE_DIR}:/root/.cache/huggingface
     command: >
-      --port 8000
-      --model ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g
-      --max-model-len 32000
-      --gpu-memory-utilization 0.83
-      --max-num-seqs 1
-      --tensor-parallel-size 2
-      --dtype bfloat16 
-      --block-size 32
+      --port 8000 --model Qwen/Qwen3-32B-AWQ --max-model-len 40960 --gpu-memory-utilization 0.75 --enable-auto-tool-choice --tool-call-parser hermes --tensor-parallel-size 2 --enable-reasoning --reasoning-parser deepseek_r1
 
   faster_whisper:
     platform: linux/amd64
@@ -61,13 +51,5 @@ services:
             - driver: nvidia
               device_ids: [ '1' ]
               capabilities: [ gpu ]
-  bericht-backend:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - WHISPER_API=http://faster_whisper:50001/v1
 volumes:
   hugging_face_cache:
