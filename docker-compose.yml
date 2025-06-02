@@ -6,7 +6,7 @@ services:
     ports:
       - ${LLM_API_PORT}:8000
     environment:
-      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+      - HUGGING_FACE_HUB_TOKEN=${HF_AUTH_TOKEN}
     runtime: nvidia
     deploy:
       resources:
