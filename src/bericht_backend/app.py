@@ -3,6 +3,9 @@ from http import HTTPStatus
 from typing import Annotated
 
 import truststore
+
+truststore.inject_into_ssl()
+
 from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,8 +24,6 @@ from bericht_backend.utils.logger import InMemoryLogHandler, get_logger, init_lo
 
 init_logger()
 logger = get_logger(__name__)
-
-truststore.inject_into_ssl()
 
 # Initialize FastAPI app
 app = FastAPI(docs_url=None)
