@@ -1,6 +1,8 @@
+from datetime import datetime
 from http import HTTPStatus
 from typing import Annotated
 
+import truststore
 from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -10,14 +12,17 @@ from llm_facade.qwen3 import QwenVllm
 from bericht_backend.config import Configuration
 from bericht_backend.models.generate_title_input import GenerateTitleInput
 from bericht_backend.models.generate_title_response import GenerateTitleResponse
+from bericht_backend.models.log_response import LogEntry, LogResponse
 from bericht_backend.models.transcription_response import TranscriptionResponse
 from bericht_backend.services.mail_services import send_email
 from bericht_backend.services.title_generation_service import TitleGenerationService
 from bericht_backend.services.whisper_services import speech_to_text
-from bericht_backend.utils.logger import get_logger, init_logger
+from bericht_backend.utils.logger import InMemoryLogHandler, get_logger, init_logger
 
 init_logger()
 logger = get_logger(__name__)
+
+truststore.inject_into_ssl()
 
 # Initialize FastAPI app
 app = FastAPI(docs_url=None)
@@ -84,6 +89,61 @@ async def send_mail(
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to send email")
 
     return {"message": "Email sent successfully"}
+
+
+@app.get("/logs", response_model=LogResponse)
+async def get_logs(
+    level: str | None = None,
+    from_time: datetime | None = None,
+    to_time: datetime | None = None,
+    limit: int = 100,
+    request_id: str | None = None,
+) -> LogResponse:
+    """
+    Endpoint to retrieve logs with optional filtering.
+
+    Args:
+        level: Filter logs by log level (e.g., INFO, WARNING, ERROR)
+        from_time: Filter logs from this time (inclusive)
+        to_time: Filter logs until this time (inclusive)
+        limit: Maximum number of logs to return
+        request_id: Filter logs by specific request ID
+
+    Returns:
+        A LogResponse containing the filtered logs
+    """
+    logger.info(
+        "Retrieving logs", level=level, from_time=from_time, to_time=to_time, limit=limit, request_id=request_id
+    )
+
+    # Get memory handler instance
+    memory_handler = InMemoryLogHandler.get_instance()
+
+    # Retrieve filtered logs
+    log_entries = memory_handler.get_logs(
+        level=level, from_time=from_time, to_time=to_time, limit=limit, request_id=request_id
+    )
+
+    # Convert to LogEntry objects for the response
+    logs = [
+        LogEntry(
+            level=entry.get("level", "UNKNOWN"),
+            timestamp=entry.get("timestamp", ""),
+            message=entry.get("event", str(entry.get("message", ""))),
+            module=entry.get("module", None),
+            function=entry.get("function", None),
+            line_number=entry.get("lineno", None),
+            request_id=entry.get("request_id", None),
+            extra={
+                k: v
+                for k, v in entry.items()
+                if k not in ["level", "timestamp", "event", "message", "module", "function", "lineno", "request_id"]
+            },
+        )
+        for entry in log_entries
+    ]
+
+    return LogResponse(logs=logs, count=len(logs), from_timestamp=from_time, to_timestamp=to_time, level_filter=level)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

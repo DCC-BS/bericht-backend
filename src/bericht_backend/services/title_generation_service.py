@@ -14,7 +14,7 @@ class TitleGenerationService:
         Args:
             openAiFacade (OpenAIFacade): An instance of OpenAIFacade for interacting with the OpenAI API.
         """
-        self.llm_facade = lmm_facade
+        self.llm_facade: LLMFacade = lmm_facade
 
     def generate_title(self, text: str) -> str:
         """

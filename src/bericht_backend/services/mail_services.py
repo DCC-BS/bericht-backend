@@ -35,9 +35,6 @@ def send_email(
 
     msg.attach(MIMEText(body, "plain"))
 
-    if word_filename is None:
-        word_filename = "report.docx"
-
     # If a Word file attachment was provided, attach it to the email
     if word_attachment:
         part = MIMEBase("application", "vnd.openxmlformats-officedocument.wordprocessingml.document")
@@ -51,7 +48,7 @@ def send_email(
 
     try:
         with smtplib.SMTP("mail.bs.ch") as server:
-            server.sendmail(from_email, to_email, msg.as_string())
+            _ = server.sendmail(from_email, to_email, msg.as_string())
         logger.info("Email sent successfully", to_email=to_email, subject=subject)
         return True
     except Exception as e:

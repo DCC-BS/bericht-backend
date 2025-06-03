@@ -10,6 +10,8 @@ copyright: Maintained by <a href="https://swordbreaker.com">Data Competence Cent
 nav:
   - Home: index.md
   - Modules: modules.md
+  - API Endpoints:
+      - Logs API: logs_api.md
 plugins:
   - search
   - mkdocstrings:
