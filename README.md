@@ -1,86 +1,216 @@
-# bericht-backend
+# Bericht Generator (Backend)
 
-[![Release](https://img.shields.io/github/v/release/swordbreaker/bericht-backend)](https://img.shields.io/github/v/release/swordbreaker/bericht-backend)
-[![Build status](https://img.shields.io/github/actions/workflow/status/swordbreaker/bericht-backend/main.yml?branch=main)](https://github.com/swordbreaker/bericht-backend/actions/workflows/main.yml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/swordbreaker/bericht-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/swordbreaker/bericht-backend)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/swordbreaker/bericht-backend)](https://img.shields.io/github/commit-activity/m/swordbreaker/bericht-backend)
-[![License](https://img.shields.io/github/license/swordbreaker/bericht-backend)](https://img.shields.io/github/license/swordbreaker/bericht-backend)
+Bericht Generator Backend is a high-performance FastAPI-based API service that powers the comprehensive report generation system. Built with modern Python 3.12+ and utilizing advanced AI technologies, it provides speech-to-text transcription, intelligent title generation, email services, and comprehensive logging capabilities. This repository contains only the backend API; the frontend is available separately.
 
-Backend for the report generator
+[![Build status](https://img.shields.io/github/actions/workflow/status/DCC-BS/bericht-backend/main.yml?branch=main)](https://github.com/DCC-BS/bericht-backend/actions/workflows/main.yml?query=branch%3Amain)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-- **Github repository**: <https://github.com/swordbreaker/bericht-backend/>
-- **Documentation** <https://swordbreaker.github.io/bericht-backend/>
+## Features
 
-## Getting started with your project
+- **Speech-to-Text**: High-quality audio transcription using Whisper API integration
+- **AI-Powered Title Generation**: Intelligent title generation using LLM (Qwen3) models
+- **Email Services**: Automated email sending with document attachments
+- **Comprehensive Logging**: Structured logging with in-memory storage and REST API access
+- **RESTful API**: Well-documented FastAPI endpoints with automatic OpenAPI documentation
+- **Production Ready**: Docker support with multi-stage builds and SSL/TLS security
+- **Type Safety**: Full type annotations compatible with Python 3.12+
+- **Async Architecture**: Non-blocking asynchronous operations for optimal performance
 
-#### Pre-requisites
+## Technology Stack
 
-Windows
-- Install [Git for Windows](https://git-scm.com/downloads/win)
-- Install [Scoop](https://scoop.sh/)
-- Install make: `scoop install make`
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) with async/await support
+- **AI/ML**: [LLM Facade](https://pypi.org/project/llm-facade/) with Qwen3 integration
+- **Speech Processing**: OpenAI Whisper API for audio transcription
+- **HTTP Client**: aiohttp for efficient async HTTP operations
+- **Logging**: Structlog for structured logging with JSON output
+- **Package Manager**: [uv](https://docs.astral.sh/uv/) for fast dependency management
+- **Code Quality**: Ruff for linting and formatting, Pre-commit hooks
+- **Testing**: pytest with coverage reporting
+- **Documentation**: MkDocs with Material theme
 
-General
-- Install [VSCode](https://code.visualstudio.com/)
+## API Endpoints
+
+### Core Services
+
+- `POST /stt` - Speech-to-text transcription from audio files
+- `POST /title` - Generate intelligent titles from text content
+- `POST /send` - Send emails with document attachments
+
+### Documentation
+
+- `/docs` - Interactive API documentation (Swagger UI)
+- `/redoc` - Alternative API documentation (ReDoc)
+
+## Setup
+
+### Environment Configuration
+
+Create a `.env` file in the project root with the required environment variables:
+
+```bash
+# Whisper API Configuration
+WHISPER_API=http://localhost:3000
+
+# LLM Configuration
+LLM_API=http://localhost:50002/v1
+LLM_MODEL="Qwen/Qwen3-32B-AWQ"
+LLM_API_KEY=your_api_key_here
+```
+
+### Pre-requisites
+
 - Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Python 3.12 or higher
 
+### Installation
 
-### 1. Create a New Repository
-
-First, create a repository on GitHub with the same name as this project, and then run the following commands:
-
+1. **Create venv with uv and install dependencies:**
 ```bash
-git init -b main
-git add .
-git commit -m "init commit"
-git remote add origin git@github.com:swordbreaker/bericht-backend.git
-git push -u origin main
+uv sync
 ```
 
-### 2. Set Up Your Development Environment
-
-Then, install the environment and the pre-commit hooks with
-
+1. **Start the development server:**
+```
+./run.sh
+```
+or directly with uv:
 ```bash
-make install
+uv run fastapi dev src/bericht_backend/app.py
 ```
 
-This will also generate your `uv.lock` file
+The API will be available at `http://localhost:8000` with interactive documentation at `http://localhost:8000/docs`.
 
-### 3. Run the pre-commit hooks
+## Development
 
-Initially, the CI/CD pipeline might be failing due to formatting issues. To resolve those run:
+### Running the Application
 
-```bash
-uv run pre-commit run -a
-```
-
-### 4. Commit the changes
-
-Lastly, commit the changes made by the two steps above to your repository.
+For development with auto-reload:
 
 ```bash
-git add .
-git commit -m 'Fix formatting issues'
-git push origin main
+uv run fastapi dev src/bericht_backend/app.py
 ```
 
-You are now ready to start development on your project!
-The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
+For production:
 
-To finalize the set-up for publishing to PyPI, see [here](https://DCC-BS.github.io/cookiecutter-uv/features/publishing/#set-up-for-pypi).
-For activating the automatic documentation with MkDocs, see [here](https://DCC-BS.github.io/cookiecutter-uv/features/mkdocs/#enabling-the-documentation-on-github).
-To enable the code coverage reports, see [here](https://DCC-BS.github.io/cookiecutter-uv/features/codecov/).
+```bash
+uv run fastapi run src/bericht_backend/app.py
+```
 
-## Releasing a new version
+### Frontend Integration
 
-- Create an API Token on [PyPI](https://pypi.org/).
-- Add the API Token to your projects secrets with the name `PYPI_TOKEN` by visiting [this page](https://github.com/swordbreaker/bericht-backend/settings/secrets/actions/new).
-- Create a [new release](https://github.com/swordbreaker/bericht-backend/releases/new) on Github.
-- Create a new tag in the form `*.*.*`.
+This backend is designed to work with the [Bericht Frontend](https://github.com/DCC-BS/bericht-frontend) application.
+Ensure both services are running and properly configured to communicate with each other.
 
-For more details, see [here](https://DCC-BS.github.io/cookiecutter-uv/features/cicd/#how-to-trigger-a-release).
+The frontend should be configured to point to this backend's URL in its environment configuration.
+
+## Code Quality
+
+### Code Formatting and Linting
+
+Format and lint code with Ruff:
+
+```bash
+# Check code quality
+uv run ruff check
+
+# Fix auto-fixable issues
+uv run ruff check --fix
+
+# Format code
+uv run ruff format
+```
+
+### Type Checking
+
+Run type checking with basedpyright:
+
+```bash
+uv run basedpyright
+```
+
+## Docker Deployment
+
+### Production Deployment
+
+The application includes a multi-stage Dockerfile:
+
+```bash
+# Build the Docker image
+docker build -t bericht-backend .
+
+# Run the container
+docker run -p 8000:8000 \
+  -e WHISPER_API=http://your-whisper-service:3000 \
+  -e QWEN_BASE_URL=http://your-llm-service:11434 \
+  bericht-backend
+```
+
+### Docker Compose
+
+For local development with dependencies:
+
+```bash
+docker-compose up -d
+```
+
+This will start any required services defined in `docker-compose.yml`.
+
+## Project Architecture
+
+```
+src/bericht_backend/
+├── app.py                 # FastAPI application and route definitions
+├── config.py              # Configuration management and environment variables
+├── models/                # Pydantic models for request/response schemas
+│   ├── generate_title_input.py
+│   ├── generate_title_response.py
+│   ├── log_response.py
+│   ├── response_format.py
+│   └── transcription_response.py
+├── services/              # Business logic and external service integrations
+│   ├── mail_services.py
+│   ├── title_generation_service.py
+│   └── whisper_services.py
+├── utils/                 # Utility functions and helpers
+│   └── logger.py
+└── stubs/                 # Type stubs for external libraries
+```
+
+## API Usage Examples
+
+### Speech-to-Text Transcription
+
+```bash
+curl -X POST "http://localhost:8000/stt" \
+  -F "audio_file=@recording.wav"
+```
+
+### Generate Title
+
+```bash
+curl -X POST "http://localhost:8000/title" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "This is a complaint about noise pollution in the neighborhood..."}'
+```
+
+### Send Email
+
+```bash
+curl -X POST "http://localhost:8000/send" \
+  -F "to_email=recipient@example.com" \
+  -F "subject=Report Document" \
+  -F "email_body=Please find the attached report." \
+  -F "file=@report.docx"
+```
+
+## License
+
+[MIT](LICENSE) © Data Competence Center Basel-Stadt
 
 ---
 
-Repository initiated with [DCC-BS/cookiecutter-uv](https://github.com/DCC-BS/cookiecutter-uv).
+<a href="https://www.bs.ch/schwerpunkte/daten/databs/schwerpunkte/datenwissenschaften-und-ki"><img src="https://github.com/DCC-BS/.github/blob/main/_imgs/databs_log.png?raw=true" alt="DCC Logo" width="200" /></a>
+
+**Datenwissenschaften und KI**  
+Developed with ❤️ by Data Alchemy Team

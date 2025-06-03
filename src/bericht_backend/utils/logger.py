@@ -19,29 +19,30 @@ class InMemoryLogHandler(logging.Handler):
 
     # Singleton instance
     _instance = None  # Type: Optional["InMemoryLogHandler"]
-    
+
     def __init__(self, capacity: int = 1000):
         """Initialize the handler with a maximum capacity for logs.
-        
+
         Args:
             capacity: Maximum number of log entries to store
         """
         super().__init__()
         self.logs: list[dict[str, Any]] = []
         self.capacity = capacity
-    
+
     def emit(self, record: logging.LogRecord) -> None:
         """Store the log record in memory.
-        
+
         Args:
             record: The log record to store
         """
         # Convert the log record to a dict for storage
         log_entry = self.format(record)
-        
+
         # Check if it's a JSON-formatted log (from structlog)
-        if log_entry.startswith('{') and log_entry.endswith('}'):
+        if log_entry.startswith("{") and log_entry.endswith("}"):
             import json
+
             try:
                 # Try to parse as JSON
                 log_dict = json.loads(log_entry)
@@ -52,70 +53,72 @@ class InMemoryLogHandler(logging.Handler):
         else:
             # For non-JSON logs, create a simple dict
             self.logs.append({"message": log_entry, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
-        
+
         # Maintain the maximum capacity
         if len(self.logs) > self.capacity:
             self.logs.pop(0)
-    
+
     @classmethod
     def get_instance(cls, capacity: int = 1000) -> "InMemoryLogHandler":
         """Get or create the singleton instance of InMemoryLogHandler.
-        
+
         Args:
             capacity: Maximum number of log entries to store
-            
+
         Returns:
             The singleton instance of InMemoryLogHandler
         """
         if cls._instance is None:
             cls._instance = InMemoryLogHandler(capacity)
         return cls._instance
-    
+
     def get_logs(
         self,
         level: str | None = None,
         from_time: datetime | None = None,
         to_time: datetime | None = None,
         limit: int = 100,
-        request_id: str | None = None
+        request_id: str | None = None,
     ) -> list[dict[str, Any]]:
         """Get logs with optional filtering.
-        
+
         Args:
             level: Filter by log level (e.g., "INFO", "ERROR")
             from_time: Filter logs from this time
             to_time: Filter logs until this time
             limit: Maximum number of logs to return
             request_id: Filter by specific request ID
-            
+
         Returns:
             A list of log entries matching the filter criteria
         """
         # Start with all logs
         filtered_logs = self.logs.copy()
-        
+
         # Apply filters
         if level:
             filtered_logs = [log for log in filtered_logs if log.get("level", "").upper() == level.upper()]
-        
+
         if from_time:
             filtered_logs = [
-                log for log in filtered_logs
+                log
+                for log in filtered_logs
                 if "timestamp" in log and datetime.fromisoformat(log["timestamp"].replace("Z", "+00:00")) >= from_time
             ]
-        
+
         if to_time:
             filtered_logs = [
-                log for log in filtered_logs
+                log
+                for log in filtered_logs
                 if "timestamp" in log and datetime.fromisoformat(log["timestamp"].replace("Z", "+00:00")) <= to_time
             ]
-        
+
         if request_id:
             filtered_logs = [log for log in filtered_logs if log.get("request_id") == request_id]
-        
+
         # Sort by timestamp (most recent first)
         filtered_logs.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-        
+
         # Apply limit
         return filtered_logs[:limit]
 
@@ -131,7 +134,7 @@ def setup_stdlib_logging() -> None:
 
     # Add in-memory handler for API access
     memory_handler = InMemoryLogHandler.get_instance()
-    
+
     # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
@@ -144,7 +147,7 @@ def setup_stdlib_logging() -> None:
         lib_logger.propagate = False
 
 
-def add_request_id(logger: BoundLogger, method_name: str, event_dict: EventDict) -> Mapping[str, Any]: # pyright: ignore[reportUnusedParameter]
+def add_request_id(logger: BoundLogger, method_name: str, event_dict: EventDict) -> Mapping[str, Any]:  # pyright: ignore[reportUnusedParameter]
     """
     Add a request ID to the log context if it doesn't exist.
 

@@ -3,9 +3,6 @@ from http import HTTPStatus
 from typing import Annotated
 
 import truststore
-
-truststore.inject_into_ssl()
-
 from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,6 +18,8 @@ from bericht_backend.services.mail_services import send_email
 from bericht_backend.services.title_generation_service import TitleGenerationService
 from bericht_backend.services.whisper_services import speech_to_text
 from bericht_backend.utils.logger import InMemoryLogHandler, get_logger, init_logger
+
+truststore.inject_into_ssl()
 
 init_logger()
 logger = get_logger(__name__)
