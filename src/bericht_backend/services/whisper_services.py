@@ -39,4 +39,6 @@ async def speech_to_text(audio_data: bytes) -> TranscriptionResponse:
     async with aiohttp.ClientSession() as session, session.post(url, data=form_data) as response:
         response.raise_for_status()
         transcription = TranscriptionResponse(**await response.json())  # pyright: ignore[reportAny]
+
+        transcription.text = transcription.text.replace("ß", "ss")
         return transcription

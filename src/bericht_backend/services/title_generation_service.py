@@ -35,6 +35,10 @@ class TitleGenerationService:
             Text: {text}
             """)
 
-        return self.llm_facade.complete(
+        title = self.llm_facade.complete(
             prompt=promt.format(text=text),
         )
+
+        title = title.replace("ß", "ss")  # Replace 'ß' with 'ss' for better readability
+        title = title.strip()
+        return title

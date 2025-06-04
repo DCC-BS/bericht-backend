@@ -69,6 +69,7 @@ async def send_mail(
     subject: Annotated[str, Form()],
     email_body: Annotated[str, Form()],
     file: UploadFile,
+    file_name: str | None = None,
 ):
     """
     Endpoint to send an email.
@@ -81,7 +82,7 @@ async def send_mail(
         subject=subject,
         body=email_body,
         word_attachment=word_attachment,
-        word_filename=file.file.name,
+        word_filename=file_name,
     )
 
     if not succcess:
