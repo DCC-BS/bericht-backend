@@ -25,7 +25,7 @@ class Configuration(LLMConfig):
         Raises:
             ValueError: If a required environment variable is missing
         """
-        load_dotenv()  # Load .env file if present
+        _ = load_dotenv()  # Load .env file if present
 
         whisper_api = os.getenv("WHISPER_API", "")
         llm_api = os.getenv("LLM_API", "")

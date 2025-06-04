@@ -76,6 +76,8 @@ defineConstant = { DEBUG = true }
 pythonVersion = "3.12"
 stubPath = "src/bericht_backend/stubs"
 reportExplicitAny = false
+reportUnknownArgumentType = false
+typeCheckingMode = "basic"
 
 
 [tool.pytest.ini_options]

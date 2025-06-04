@@ -77,6 +77,9 @@ async def send_mail(
 
     word_attachment = await file.read()
 
+    if not file_name:
+        file_name = file.filename if file.filename else "document.docx"
+
     succcess = send_email(
         to_email=to_email,
         subject=subject,
@@ -128,13 +131,17 @@ async def get_logs(
     # Convert to LogEntry objects for the response
     logs = [
         LogEntry(
-            level=entry.get("level", "UNKNOWN"),
-            timestamp=entry.get("timestamp", ""),
-            message=entry.get("event", str(entry.get("message", ""))),
-            module=entry.get("module", None),
-            function=entry.get("function", None),
-            line_number=entry.get("lineno", None),
-            request_id=entry.get("request_id", None),
+            level=str(entry.get("level", "UNKNOWN")),
+            timestamp=str(entry.get("timestamp", "")),
+            message=str(entry.get("event", str(entry.get("message", "")))),
+            module=str(entry.get("module")) if entry.get("module") is not None else None,
+            function=str(entry.get("function")) if entry.get("function") is not None else None,
+            line_number=int(entry["lineno"])
+            if entry.get("lineno") is not None
+            and isinstance(entry.get("lineno"), (int, str))
+            and str(entry.get("lineno")).isdigit()
+            else None,
+            request_id=str(entry.get("request_id")) if entry.get("request_id") is not None else None,
             extra={
                 k: v
                 for k, v in entry.items()

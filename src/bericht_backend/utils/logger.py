@@ -1,10 +1,11 @@
+import json
 import logging
 import os
 import time
 import uuid
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any
+from typing import Any, override
 
 import structlog
 import structlog.processors
@@ -18,7 +19,7 @@ class InMemoryLogHandler(logging.Handler):
     """A logging handler that keeps logs in memory for retrieval via API."""
 
     # Singleton instance
-    _instance = None  # Type: Optional["InMemoryLogHandler"]
+    _instance: "InMemoryLogHandler | None" = None
 
     def __init__(self, capacity: int = 1000):
         """Initialize the handler with a maximum capacity for logs.
@@ -28,8 +29,9 @@ class InMemoryLogHandler(logging.Handler):
         """
         super().__init__()
         self.logs: list[dict[str, Any]] = []
-        self.capacity = capacity
+        self.capacity: int = capacity
 
+    @override
     def emit(self, record: logging.LogRecord) -> None:
         """Store the log record in memory.
 
@@ -41,12 +43,14 @@ class InMemoryLogHandler(logging.Handler):
 
         # Check if it's a JSON-formatted log (from structlog)
         if log_entry.startswith("{") and log_entry.endswith("}"):
-            import json
-
             try:
                 # Try to parse as JSON
                 log_dict = json.loads(log_entry)
-                self.logs.append(log_dict)
+                if isinstance(log_dict, dict):
+                    self.logs.append(log_dict)
+                else:
+                    # If it's not a dict, store as plain text
+                    self.logs.append({"message": log_entry, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
             except json.JSONDecodeError:
                 # If it's not valid JSON, store as plain text
                 self.logs.append({"message": log_entry, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
@@ -56,7 +60,7 @@ class InMemoryLogHandler(logging.Handler):
 
         # Maintain the maximum capacity
         if len(self.logs) > self.capacity:
-            self.logs.pop(0)
+            _ = self.logs.pop(0)
 
     @classmethod
     def get_instance(cls, capacity: int = 1000) -> "InMemoryLogHandler":
@@ -97,27 +101,27 @@ class InMemoryLogHandler(logging.Handler):
 
         # Apply filters
         if level:
-            filtered_logs = [log for log in filtered_logs if log.get("level", "").upper() == level.upper()]
+            filtered_logs = [log for log in filtered_logs if str(log.get("level", "")).upper() == level.upper()]
 
         if from_time:
             filtered_logs = [
                 log
                 for log in filtered_logs
-                if "timestamp" in log and datetime.fromisoformat(log["timestamp"].replace("Z", "+00:00")) >= from_time
+                if "timestamp" in log and datetime.fromisoformat(str(log["timestamp"]).replace("Z", "+00:00")) >= from_time
             ]
 
         if to_time:
             filtered_logs = [
                 log
                 for log in filtered_logs
-                if "timestamp" in log and datetime.fromisoformat(log["timestamp"].replace("Z", "+00:00")) <= to_time
+                if "timestamp" in log and datetime.fromisoformat(str(log["timestamp"]).replace("Z", "+00:00")) <= to_time
             ]
 
         if request_id:
             filtered_logs = [log for log in filtered_logs if log.get("request_id") == request_id]
 
         # Sort by timestamp (most recent first)
-        filtered_logs.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+        filtered_logs.sort(key=lambda x: str(x.get("timestamp", "")), reverse=True)
 
         # Apply limit
         return filtered_logs[:limit]
