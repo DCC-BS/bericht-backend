@@ -23,7 +23,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "fastapi[all]>=0.115.11",
     "llm-facade",
-    "openai==1.97.1",
+    "openai==1.98.0",
     "python-dotenv>=1.0.1",
     "structlog>=25.1.0",
     "truststore>=0.10.1",
