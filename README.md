@@ -213,4 +213,4 @@ curl -X POST "http://localhost:8000/send" \
 <a href="https://www.bs.ch/schwerpunkte/daten/databs/schwerpunkte/datenwissenschaften-und-ki"><img src="https://github.com/DCC-BS/.github/blob/main/_imgs/databs_log.png?raw=true" alt="DCC Logo" width="200" /></a>
 
 **Datenwissenschaften und KI**  
-Developed with ❤️ by Data Alchemy Team
+Developed with ❤️ by DCC - Data Competence Center
