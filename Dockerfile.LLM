@@ -1,3 +1,3 @@
-FROM vllm/vllm-openai:v0.10.0
+FROM vllm/vllm-openai:v0.10.2
 
 RUN uv pip install auto_gptq==0.8.0  # Required for GPTQ models
