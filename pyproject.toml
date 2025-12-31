@@ -166,4 +166,4 @@ exclude_also = [
 ]
 
 [tool.uv.sources]
-llm-facade = { git = "https://github.com/DCC-BS/llm-facade.bs.py.git", rev = "v0.0.8" }
+llm-facade = { git = "https://github.com/DCC-BS/llm-facade.bs.py.git", rev = "79cad2c0caf28ef9e6edda72a6f255ef38de2018" }
