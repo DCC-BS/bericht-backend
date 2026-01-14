@@ -1,0 +1,37 @@
+publiccodeYmlVersion: 0.5.0
+name: Berichtgenerator Backend
+url: https://github.com/DCC-BS/bericht-backend
+softwareVersion: 0.0.1
+releaseDate: 2025-08-21
+platforms:
+  - web
+developmentStatus: beta
+softwareType: standalone/backend
+organisation:
+  name: DCC Data Competence Center - Statistisches Amt Kanton Basel-Stadt
+description:
+  en:
+    localisedName: Berichtgenerator
+    shortDescription: "Bericht Generator Backend is a high-performance FastAPI-based API service that powers the comprehensive report generation system."
+    longDescription: Bericht Generator Backend is a high-performance FastAPI-based API service that powers the comprehensive report generation system. Built with modern Python 3.12+ and utilizing advanced AI technologies, it provides speech-to-text transcription, intelligent title generation, email services, and comprehensive logging capabilities. 
+    documentation: https://dcc-bs.github.io/documentation/
+    apiDocumentation: https://dcc-bs.github.io/documentation/
+    features:
+      - LLM
+      - PWA
+    screenshots:
+      - https://github.com/DCC-BS/bericht-frontend/blob/main/_imgs/report.png
+      - https://github.com/DCC-BS/bericht-frontend/blob/main/_imgs/draw.png
+legal:
+  license: MIT-0
+maintenance:
+  type: internal
+  contacts:
+    - name: Data Competence Center
+      email: dcc@bs.ch
+      affiliation: Statistisches Amt Kanton Basel-Stadt
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+    - de-CH
